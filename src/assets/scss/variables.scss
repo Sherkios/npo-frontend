@@ -1,0 +1,70 @@
+:root {
+  --primary-color: #407bff;
+  --primary-light-color: #77a6ff;
+  --primary-background-color: #ecf3ff;
+  // --primary-dark-color: #3977da;
+  --secondary-color: #f5f5f5;
+  --accent-color: #9cbeff;
+  --accent-hover-color: #f2f7ff;
+  --placeholder-color: #a6a3ad;
+
+  --white: #ffffff;
+  --white-50: rgba(255, 255, 255, 0.5);
+  --background-color: #d8e7fd;
+  --secondary-background-color: #f8f9fd;
+
+  --text-color: #111111;
+  // --text-hover-color: #606c80;
+  --subtext-color: #666666;
+
+  --border-color: #d5d5d6;
+
+  // --disabled-color: #d1d5db;
+
+  // --negative-color: #f87171;
+
+  --icon-fill: var(--white);
+  --icon-stroke: #757d8a;
+}
+
+// button
+:root {
+  --button-color: var(--white);
+  --button-background-color: var(--primary-light-color);
+}
+
+// input
+:root {
+  --input-border-color: var(--border-color);
+  --input-placeholder-color: var(--placeholder-color);
+  --input-padding-vertical: 15px;
+  --input-padding-horizontal: 15px;
+  --input-padding: var(--input-padding-vertical) var(--input-padding-horizontal);
+  --input-background-color: var(--white);
+  --input-color: var(--text-color);
+}
+
+// select
+:root {
+  --select-border-color: transparent;
+  --select-color: var(--text-color);
+  --select-placeholder-color: var(--input-placeholder-color);
+  --select-background-color: var(--white);
+  --select-main-padding-vertical: var(--input-padding-vertical);
+  --select-main-padding-horizontal: var(--input-padding-horizontal);
+  --select-main-padding: var(--select-main-padding-vertical) var(--select-main-padding-horizontal);
+  --select-border-color: var(--border-color);
+  // --select-icon-color: var(--primary-color);
+
+  --option-background-color: var(--white);
+  // --option-current-background-color: var(--option-background-color);
+  --option-title-color: var(--secondary-color);
+  --option-color: var(--select-color);
+  --option-current-color: var(--option-color);
+  --option-hover-color: var(--option-color);
+}
+
+// checkbox
+:root {
+  --checkbox-border-color: var(--input-border-color);
+}

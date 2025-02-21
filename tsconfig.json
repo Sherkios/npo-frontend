@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "assets/*": ["src/assets/*"],
+      "components/*": ["src/components/*"],
+      "services/*": ["src/services/*"],
+      "use/*": ["src/use/*"],
+      "src/*": ["src/*"],
+      "public/*": ["public/*"]
+    }
+  },
+  "files": [],
+  "extends": "./tsconfig.app.json"
+}
