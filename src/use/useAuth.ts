@@ -23,12 +23,10 @@ export default function useUser() {
       const users = JSON.parse(storage) as IUserRow[];
 
       users.push(user);
-
-      console.log("exist");
+      _users.value = users;
 
       localStorage.setItem("users", JSON.stringify(users));
     } else {
-      console.log("creatr");
       localStorage.setItem("users", JSON.stringify([user]));
     }
   };
@@ -38,8 +36,6 @@ export default function useUser() {
   };
 
   const signInWithSave = (form: { login: string; tabel: string; password: string }) => {
-    console.log("save");
-
     signIn(form);
 
     const user: IUserRow = {
