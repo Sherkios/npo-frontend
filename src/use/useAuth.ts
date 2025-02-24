@@ -27,7 +27,6 @@ export default function useUser() {
       const users = JSON.parse(storage) as IUserRow[];
 
       const oldUser = users.find(value => user.id === value.id);
-      console.log("old", oldUser, user);
 
       if (!oldUser) {
         users.push(user);
@@ -37,6 +36,7 @@ export default function useUser() {
       }
     } else {
       localStorage.setItem("users", JSON.stringify([user]));
+      _users.value = [user];
     }
   };
 
@@ -79,7 +79,7 @@ export default function useUser() {
         img: "public/avatar.png",
       };
 
-      new Promise(resolve => resolve(saveUser(user)));
+      saveUser(user);
     }
 
     return response;
