@@ -76,7 +76,7 @@ export default function useUser() {
         id: response.id,
         login: form.login,
         tabel: form.tabel,
-        img: "public/avatae.png",
+        img: "public/avatar.png",
       };
 
       new Promise(resolve => resolve(saveUser(user)));
