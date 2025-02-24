@@ -67,11 +67,10 @@ const closeRow = (e: Event) => {
   const target = e.target as HTMLElement;
   const parent: HTMLElement | null = target.closest(".user-row");
 
-  password.value = "";
-
   if (target.namespaceURI === "http://www.w3.org/2000/svg") return;
 
   if (isFull.value && parent !== refRow.value?.$el) {
+    password.value = "";
     isFull.value = false;
     emit("close");
   }

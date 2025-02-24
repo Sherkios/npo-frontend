@@ -76,8 +76,8 @@
             notificateMessage
           }}</notificate-message>
 
-          <div class="auth-page__users-list">
-            <base-row @click="addUser">
+          <div class="auth-page__users-wrapper">
+            <base-row @click="addUser" class="auth-page__new-user">
               <template #base-row-avatar>
                 <plus-icon></plus-icon>
               </template>
@@ -85,17 +85,19 @@
               <template #default> Добавить пользователя</template>
             </base-row>
 
-            <user-row
-              v-for="user in users"
-              :key="user.id"
-              v-bind="user"
-              class="auth-page__user"
-              @sign-in="
-                password => signInHandler({ login: user.login, tabel: user.tabel, password })
-              "
-              @close="hideNotificate"
-              @open="hideNotificate"
-            />
+            <div class="auth-page__users-list">
+              <user-row
+                v-for="user in users"
+                :key="user.id"
+                v-bind="user"
+                class="auth-page__user"
+                @sign-in="
+                  password => signInHandler({ login: user.login, tabel: user.tabel, password })
+                "
+                @close="hideNotificate"
+                @open="hideNotificate"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -176,11 +178,10 @@ const signInHandler = async (form: ISignInForm, save: boolean = false) => {
     response = await signIn(form);
   }
 
-  resetForm();
-
   if (response && !isError(response)) {
     isFullAuth.value = false;
     showSuccess("Пользователь успешно авторизован");
+    resetForm();
   } else {
     notificateMessage.value = response.message;
     showError(response.message);
@@ -237,6 +238,7 @@ onMounted(async () => {
 
 <style scoped lang="scss">
 .auth-page {
+  max-height: 100vh;
   &__content {
     position: relative;
     padding: 70px 50px 110px 50px;
@@ -316,6 +318,7 @@ onMounted(async () => {
   &__users-content {
     width: 100%;
     max-width: 470px;
+    height: 100%;
 
     display: flex;
     flex-direction: column;
@@ -353,10 +356,17 @@ onMounted(async () => {
   &__users-text {
   }
 
+  &__users-wrapper,
   &__users-list {
     display: flex;
     flex-direction: column;
     gap: 20px;
+
+    overflow: hidden;
+  }
+
+  &__users-list {
+    overflow-y: auto;
   }
 
   &__user {
