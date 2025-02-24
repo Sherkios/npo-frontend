@@ -2,7 +2,7 @@ import { isAxiosError, type AxiosResponse } from "axios";
 import isError from "src/helpers/guards/is-error";
 import api from "src/service/api/api";
 import { saveJwt } from "src/service/jwt";
-import type { IAccessToken, IUser, IUserRow } from "src/types";
+import type { IAccessToken, ISignInForm, IUser, IUserRow } from "src/types";
 import { computed, ref } from "vue";
 
 export default function useUser() {
@@ -50,11 +50,7 @@ export default function useUser() {
     }
   };
 
-  const signIn = async (form: {
-    login: string;
-    tabel: string;
-    password: string;
-  }): Promise<IAccessToken | Error> => {
+  const signIn = async (form: ISignInForm): Promise<IAccessToken | Error> => {
     try {
       const response: AxiosResponse<IAccessToken> = await api.post("auth/login", {
         ...form,
@@ -66,17 +62,13 @@ export default function useUser() {
       return token;
     } catch (error) {
       if (isAxiosError(error)) {
-        return new Error("Ошибка авторизации");
+        return new Error("Неверный логин, табель или пароль");
       }
       throw new Error("Непредвиденная ошибка");
     }
   };
 
-  const signInWithSave = async (form: {
-    login: string;
-    tabel: string;
-    password: string;
-  }): Promise<IAccessToken | Error> => {
+  const signInWithSave = async (form: ISignInForm): Promise<IAccessToken | Error> => {
     const response = await signIn(form);
 
     if (!isError(response)) {
@@ -87,9 +79,7 @@ export default function useUser() {
         img: "public/avatae.png",
       };
 
-      console.log(user);
-
-      saveUser(user);
+      new Promise(resolve => resolve(saveUser(user)));
     }
 
     return response;

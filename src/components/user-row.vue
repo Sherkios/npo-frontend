@@ -14,7 +14,9 @@
     <template v-if="isFull" #base-row-additional>
       <div class="user-row__form">
         <password-input v-model="password"></password-input>
-        <base-button class="user-row__button" @click="signIn">Войти</base-button>
+        <base-button class="user-row__button" :disabled="isDisabled" @click="signIn"
+          >Войти</base-button
+        >
       </div>
     </template>
   </base-row>
@@ -42,8 +44,12 @@ const rowClass = computed(() => [{ "user-row_full": isFull.value }]);
 
 const password = ref<string>("");
 
+const isDisabled = computed(() => Boolean(!password.value));
+
 const emit = defineEmits<{
   (e: "sign-in", password: string): void;
+  (e: "close"): void;
+  (e: "open"): void;
 }>();
 
 const signIn = () => {
@@ -51,7 +57,10 @@ const signIn = () => {
 };
 
 const openRow = () => {
-  if (!isFull.value) isFull.value = true;
+  if (!isFull.value) {
+    isFull.value = true;
+    emit("open");
+  }
 };
 
 const closeRow = (e: Event) => {
@@ -62,7 +71,10 @@ const closeRow = (e: Event) => {
 
   if (target.namespaceURI === "http://www.w3.org/2000/svg") return;
 
-  if (isFull.value && parent !== refRow.value?.$el) isFull.value = false;
+  if (isFull.value && parent !== refRow.value?.$el) {
+    isFull.value = false;
+    emit("close");
+  }
 };
 
 onMounted(() => {

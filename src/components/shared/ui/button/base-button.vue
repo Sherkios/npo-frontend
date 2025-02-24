@@ -64,17 +64,20 @@ const buttonClass = computed(() => [
   font-size: 20px;
   line-height: 24px;
 
-
   transition: all 0.2s ease;
-
 
   &:disabled {
     --button-color: var(--subtext-color);
-    --button-background-color: var(--secondary-color)
+    --button-background-color: var(--secondary-color);
     cursor: default;
+
+    &:hover {
+      --button-background-color: var(--secondary-color);
+    }
   }
 
-  &:hover, &:active {
+  &:hover,
+  &:active {
     --button-background-color: var(--primary-color);
   }
 
@@ -90,8 +93,6 @@ const buttonClass = computed(() => [
       --button-color: var(--primary-light-color);
       --button-background-color: var(--primary-background-color);
     }
-
-
   }
 
   &__loader {

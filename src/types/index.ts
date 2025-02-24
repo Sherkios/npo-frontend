@@ -12,3 +12,9 @@ export interface IAccessToken {
   access_token: string;
   id: number;
 }
+
+export interface ISignInForm {
+  login: string;
+  tabel: string;
+  password: string;
+}

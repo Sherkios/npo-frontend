@@ -19,6 +19,10 @@
         <div class="auth-page__main">
           <h1 class="auth-page__title">Вход в ERP-систему</h1>
 
+          <notificate-message v-if="isShowNotificate" :status="notificateStatus">{{
+            notificateMessage
+          }}</notificate-message>
+
           <div class="auth-page__form">
             <base-select
               v-model="authForm.tabel"
@@ -45,7 +49,13 @@
 
           <base-checkbox v-model="authForm.save">Запомнить аккаунт</base-checkbox>
 
-          <base-button class="auth-page__button" @click="signInHandler">Войти</base-button>
+          <base-button
+            class="auth-page__button"
+            :disabled="isDisabled"
+            @click="signInHandler(authForm, authForm.save)"
+          >
+            Войти
+          </base-button>
         </div>
       </div>
 
@@ -62,6 +72,10 @@
             </div>
           </div>
 
+          <notificate-message v-if="isShowNotificate" :status="notificateStatus">{{
+            notificateMessage
+          }}</notificate-message>
+
           <div class="auth-page__users-list">
             <base-row @click="addUser">
               <template #base-row-avatar>
@@ -76,7 +90,11 @@
               :key="user.id"
               v-bind="user"
               class="auth-page__user"
-              @sign-in="password => signIn({ login: user.login, tabel: user.tabel, password })"
+              @sign-in="
+                password => signInHandler({ login: user.login, tabel: user.tabel, password })
+              "
+              @close="hideNotificate"
+              @open="hideNotificate"
             />
           </div>
         </div>
@@ -91,6 +109,7 @@
 </template>
 
 <script setup lang="ts">
+import NotificateMessage from "components/notificate-message.vue";
 import BaseRow from "components/shared/base-row.vue";
 import ArrowLeftIcon from "components/shared/icons/arrow-left-icon.vue";
 import PlusIcon from "components/shared/icons/plus-icon.vue";
@@ -103,16 +122,18 @@ import BaseSelect from "components/shared/ui/select/base-select.vue";
 import type { IOption } from "components/shared/ui/select/types";
 import UserRow from "components/user-row.vue";
 import isError from "src/helpers/guards/is-error";
-import type { IAccessToken, IUser } from "src/types";
+import type { IAccessToken, ISignInForm, IUser } from "src/types";
 import useUser from "use/useAuth";
-import { computed, onMounted, ref } from "vue";
-
-const options = ref<IOption<number>[]>([]);
+import { computed, onMounted, ref, watch } from "vue";
 
 const tabelOptions = ref<IOption<string>[]>([]);
 const setTabelOptions = (users: IUser[]) => {
   tabelOptions.value = users.map(user => ({ name: user.tabel, value: user.tabel }));
 };
+
+const isDisabled = computed(
+  () => !authForm.value.login || !authForm.value.tabel || !authForm.value.password,
+);
 
 const loginOptions = ref<IOption<string>[]>([]);
 const setLoginOptions = (users: IUser[]) => {
@@ -124,6 +145,12 @@ const { users, signIn, signInWithSave, getUsers } = useUser();
 const isExistUsers = computed(() => (users.value.length ? true : false));
 const isFullAuth = ref(!isExistUsers.value);
 
+watch(isFullAuth, () => {
+  if (isFullAuth.value === true) {
+    hideNotificate();
+  }
+});
+
 const isShowPagination = computed(() => (isExistUsers.value ? true : false));
 
 const authForm = ref<{ login: string; tabel: string; password: string; save: boolean }>({
@@ -133,9 +160,14 @@ const authForm = ref<{ login: string; tabel: string; password: string; save: boo
   save: false,
 });
 
-const signInHandler = async () => {
-  const { save, ...form } = authForm.value;
+const resetForm = () => {
+  authForm.value.login = "";
+  authForm.value.tabel = "";
+  authForm.value.password = "";
+  authForm.value.save = false;
+};
 
+const signInHandler = async (form: ISignInForm, save: boolean = false) => {
   let response: IAccessToken | Error | null = null;
 
   if (save) {
@@ -144,8 +176,14 @@ const signInHandler = async () => {
     response = await signIn(form);
   }
 
+  resetForm();
+
   if (response && !isError(response)) {
     isFullAuth.value = false;
+    showSuccess("Пользователь успешно авторизован");
+  } else {
+    notificateMessage.value = response.message;
+    showError(response.message);
   }
 };
 
@@ -156,6 +194,38 @@ const addUser = () => {
 const toUsers = () => {
   isFullAuth.value = false;
 };
+
+const notificateMessage = ref<string>("Ошибка");
+const notificateStatus = ref<"error" | "success">("error");
+const isShowNotificate = ref<boolean>(false);
+
+const hideNotificate = () => {
+  isShowNotificate.value = false;
+};
+
+const showNotificate = () => {
+  isShowNotificate.value = true;
+};
+
+const decoratorNotificate = <T extends (message: string) => ReturnType<T>>(calle: T) => {
+  return (message: string) => {
+    notificateMessage.value = message;
+    const result = calle(message);
+    showNotificate();
+
+    return result;
+  };
+};
+const setSuccessNotificate = () => {
+  notificateStatus.value = "success";
+};
+
+const setErrorNotificate = () => {
+  notificateStatus.value = "error";
+};
+
+const showSuccess = decoratorNotificate(setSuccessNotificate);
+const showError = decoratorNotificate(setErrorNotificate);
 
 onMounted(async () => {
   const users = await getUsers();
