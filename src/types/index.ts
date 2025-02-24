@@ -7,3 +7,8 @@ export interface IUser {
 export interface IUserRow extends IUser {
   img?: string;
 }
+
+export interface IAccessToken {
+  access_token: string;
+  id: number;
+}

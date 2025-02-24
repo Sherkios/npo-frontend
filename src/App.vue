@@ -22,7 +22,7 @@
           <div class="auth-page__form">
             <base-select
               v-model="authForm.tabel"
-              :options
+              :options="tabelOptions"
               placeholder="Введите табельный номер"
               class="auth-page__select"
             >
@@ -31,7 +31,7 @@
 
             <base-select
               v-model="authForm.login"
-              :options
+              :options="loginOptions"
               placeholder="Введите логин"
               class="auth-page__select"
             >
@@ -102,25 +102,24 @@ import BaseSelect from "components/shared/ui/select/base-select.vue";
 
 import type { IOption } from "components/shared/ui/select/types";
 import UserRow from "components/user-row.vue";
+import isError from "src/helpers/guards/is-error";
+import type { IAccessToken, IUser } from "src/types";
 import useUser from "use/useAuth";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
-const options = ref<IOption<number>[]>([
-  {
-    name: "Option 1",
-    value: 1,
-  },
-  {
-    name: "Option 2",
-    value: 2,
-  },
-  {
-    name: "Option 3",
-    value: 3,
-  },
-]);
+const options = ref<IOption<number>[]>([]);
 
-const { users, signIn, signInWithSave } = useUser();
+const tabelOptions = ref<IOption<string>[]>([]);
+const setTabelOptions = (users: IUser[]) => {
+  tabelOptions.value = users.map(user => ({ name: user.tabel, value: user.tabel }));
+};
+
+const loginOptions = ref<IOption<string>[]>([]);
+const setLoginOptions = (users: IUser[]) => {
+  loginOptions.value = users.map(user => ({ name: user.login, value: user.login }));
+};
+
+const { users, signIn, signInWithSave, getUsers } = useUser();
 
 const isExistUsers = computed(() => (users.value.length ? true : false));
 const isFullAuth = ref(!isExistUsers.value);
@@ -134,16 +133,20 @@ const authForm = ref<{ login: string; tabel: string; password: string; save: boo
   save: false,
 });
 
-const signInHandler = () => {
+const signInHandler = async () => {
   const { save, ...form } = authForm.value;
 
+  let response: IAccessToken | Error | null = null;
+
   if (save) {
-    signInWithSave(form);
+    response = await signInWithSave(form);
   } else {
-    signIn(form);
+    response = await signIn(form);
   }
 
-  isFullAuth.value = false;
+  if (response && !isError(response)) {
+    isFullAuth.value = false;
+  }
 };
 
 const addUser = () => {
@@ -153,6 +156,13 @@ const addUser = () => {
 const toUsers = () => {
   isFullAuth.value = false;
 };
+
+onMounted(async () => {
+  const users = await getUsers();
+
+  setLoginOptions(users);
+  setTabelOptions(users);
+});
 </script>
 
 <style scoped lang="scss">
